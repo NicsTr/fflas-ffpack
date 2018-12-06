@@ -34,10 +34,12 @@ endif
 
 EXAMPLES =  \
 	det		\
+	matmul_debug\
 	pluq
 
 det_SOURCES = det.C
 pluq_SOURCES = pluq.C
+matmul_debug_SOURCES = matmul_debug.C
 
 CLEANFILES = $(EXAMPLES)
 
