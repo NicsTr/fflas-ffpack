@@ -23,15 +23,14 @@
 #include "fflas-ffpack/fflas-ffpack.h"
 
 /**
- * This example computes the matrix multiplication
+ * This example solve the quare system defined by the input
  * over a defined finite field.
  *
- * Outputs the product of the matrix given as input.
  */
 int main(int argc, char** argv)
 {
     if (argc != 4) {
-        std::cerr << "Usage: matmul <p> <matrixA> <matrixB>" << std::endl;
+        std::cerr << "Usage: solve <p> <matrixA> <matrixB>" << std::endl;
         return -1;
     }
 
@@ -43,25 +42,33 @@ int main(int argc, char** argv)
     Givaro::Modular<double> F(p);
 
     // Reading the matrices
-    double* A, *B, *C;
+    double* A, *B, *X;
     size_t mA, nA, mB, nB;
+    int info = 0;
     FFLAS::ReadMatrix(fileA.c_str(), F, mA, nA, A);
     FFLAS::ReadMatrix(fileB.c_str(), F, mB, nB, B);
-    C = FFLAS::fflas_new(F, mA, nB);
+    X = FFLAS::fflas_new(F, nA, nB);
 
-    if (nA != mB) {
-        std::cerr << "Those matrices can't be multiplied together" << std::endl;
+    if (mA != nA || mA != mB) {
+        std::cerr << "At least one input matrix has not the right dimension";
+        std::cerr  << std::endl;
         return -1;
     }
 
-    FFLAS::fgemm(F, FFLAS::FflasNoTrans, FFLAS::FflasNoTrans, mA, nB, nA,
-            F.one, A, nA, B, nB, F.zero, C, nA);
+    size_t rank = FFPACK::fgesv(F, FFLAS::FflasLeft, mA, nA, nB, A, nA, X, mA,
+            B, nB, &info);
+    
+    std::cout << "info: " << info << std::endl;
+    std::cout << "rank: " << rank << std::endl;
 
-    FFLAS::WriteMatrix(std::cout << "Result" << std::endl, F, mA, nB, C, nA) << std::endl;
+    FFLAS::WriteMatrix(std::cout << "debug B" << std::endl, F, mB, nB, B,
+            nB) << std::endl;
+    FFLAS::WriteMatrix(std::cout << "solution" << std::endl, F, nA, nB, X,
+            mA) << std::endl;
 
     FFLAS::fflas_delete(A);
     FFLAS::fflas_delete(B);
-    FFLAS::fflas_delete(C);
+    FFLAS::fflas_delete(X);
 
     return 0;
 }
