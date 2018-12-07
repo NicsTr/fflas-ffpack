@@ -55,9 +55,9 @@ int main(int argc, char** argv)
     }
 
     FFLAS::fgemm(F, FFLAS::FflasNoTrans, FFLAS::FflasNoTrans, mA, nB, nA,
-            F.one, A, mA, B, mB, F.zero, C, mA);
+            F.one, A, nA, B, nB, F.zero, C, nA);
 
-    FFLAS::WriteMatrix(std::cout << "Result" << std::endl, F, mA, nB, C, mA) << std::endl;
+    FFLAS::WriteMatrix(std::cout << "Result" << std::endl, F, mA, nB, C, nA) << std::endl;
 
     FFLAS::fflas_delete(A);
     FFLAS::fflas_delete(B);

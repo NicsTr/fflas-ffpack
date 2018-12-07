@@ -38,6 +38,7 @@ int main(int argc, char** argv)
     std::string fileA = argv[2];
     std::string fileB = argv[3];
 
+
     // Creating the finite field Z/pZ (assuming p>2, use Modular<float> for p=2)
     Givaro::ModularBalanced<double> F(p);
 
@@ -55,18 +56,19 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    size_t rank = FFPACK::fgesv(F, FFLAS::FflasLeft, mA, nA, nB, A, nA, X, nB, 
+    size_t rank = FFPACK::fgesv(F, FFLAS::FflasLeft, mA, nA, nB, A, nA, X, mA,
             B, nB, &info);
-    
+  
     if (info){
         std::cout << "System is inconsistent" << std::endl;
         return -1;
     }
-
     std::cout << "rank: " << rank << std::endl;
 
-    FFLAS::WriteMatrix(std::cout << "debug B" << std::endl, F, mB, nB, B, nB) << std::endl;
-    FFLAS::WriteMatrix(std::cout << "solution" << std::endl, F, nA, nB, X, nB) << std::endl;
+    FFLAS::WriteMatrix(std::cout << "debug B" << std::endl, F, mB, nB, B,
+            nB) << std::endl;
+    FFLAS::WriteMatrix(std::cout << "solution" << std::endl, F, nA, nB, X,
+            mA) << std::endl;
 
     FFLAS::fflas_delete(A);
     FFLAS::fflas_delete(B);
